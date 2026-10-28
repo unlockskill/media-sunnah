@@ -66,8 +66,18 @@
       <div id="date">Memuat tanggal...</div>
     </div>
     <div class="location-control">
-      <label for="region-select">Lokasi waktu dan jadwal salat</label>
-      <select id="region-select"><option value="">Mendeteksi lokasi atau memuat daftar kota...</option></select>
+      
+<label for="region-search">Cari kota atau kabupaten</label>
+<input
+  id="region-search"
+  type="search"
+  placeholder="Contoh: Makassar, Bogor..."
+  autocomplete="off"
+>
+<select id="region-select">
+  <option value="">Mendeteksi lokasi atau memuat daftar kota...</option>
+</select>
+
       <div class="location-status" id="location-status">Izinkan akses lokasi agar jadwal salat mengikuti wilayah terdekat, atau pilih kota secara manual.</div>
     </div>
   </section>
