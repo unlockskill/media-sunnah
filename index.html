@@ -318,7 +318,29 @@ function populateRegionSelect() {
   async function initLocationAndPrayer(){const status=document.getElementById("location-status");try{const response=await fetch(REGIONS_URL);if(!response.ok)throw new Error("Daftar wilayah tidak tersedia");const payload=await response.json();prayerRegions=normaliseRegions(payload);if(!prayerRegions.length)throw new Error("Format daftar wilayah tidak dikenali");populateRegionSelect();activeRegion=fallbackRegionByTimeZone();if(activeRegion)document.getElementById("region-select").value=activeRegion.id;updateClock();await loadPrayerTimes();}catch(e){status.textContent="Daftar kota belum dapat dimuat. Jam mengikuti zona waktu perangkat, sedangkan jadwal salat memerlukan pilihan wilayah yang didukung.";activeRegion=null;updateClock();document.getElementById("prayer-date").textContent="Jadwal salat belum dapat dimuat.";document.getElementById("prayer-times").innerHTML="<div class='prayer-item' style='grid-column:1/-1'>Periksa koneksi internet, kemudian muat ulang halaman.</div>";return;}
     if(navigator.geolocation){status.textContent="Meminta lokasi perangkat untuk memilih wilayah terdekat. Kamu juga dapat memilih kota secara manual.";navigator.geolocation.getCurrentPosition(async pos=>{const r=nearestRegion(pos.coords.latitude,pos.coords.longitude);if(r){activeRegion=r;document.getElementById("region-select").value=r.id;status.textContent="Wilayah terdekat terdeteksi dari lokasi perangkat. Kamu dapat menggantinya secara manual.";updateClock();await loadPrayerTimes();}},()=>{status.textContent="Akses lokasi tidak diberikan. Jam mengikuti zona waktu perangkat; kota salat awal dipilih berdasarkan zona waktu dan dapat kamu ubah manual.";},{enableHighAccuracy:false,timeout:9000,maximumAge:600000});}}
   async function loadPrayerTimes(){const dateEl=document.getElementById("prayer-date"),timesEl=document.getElementById("prayer-times");if(!activeRegion?.id){dateEl.textContent="Pilih kota untuk memuat jadwal salat.";return;}const zone=activeRegion.tz||getLocalTimeZone();const date=dateForZone(zone);const year=date.slice(0,4);dateEl.textContent=`${formatDate(zone)} · ${zoneAbbr(activeRegion)} · ${activeRegion.name||activeRegion.id}`;timesEl.innerHTML="<div class='prayer-item' style='grid-column:1/-1'>Memuat jadwal salat wilayah...</div>";try{const response=await fetch(`${TIME_API_BASE}${encodeURIComponent(activeRegion.id)}/${year}.json`);if(!response.ok)throw new Error("Jadwal wilayah tidak tersedia");const data=await response.json();const dateIndex=data.fields.indexOf("date");const row=data.days.find(day=>day[dateIndex]===date);if(!row)throw new Error("Tanggal tidak ditemukan");const timeFor=key=>{const i=data.fields.indexOf(key);return i>=0?row[i]:null;};const prayers=[["Subuh","fajr"],["Zuhur","dhuhr"],["Asar","asr"],["Magrib","maghrib"],["Isya","isha"]];timesEl.innerHTML=prayers.map(([label,key])=>{const time=timeFor(key);return time?`<div class="prayer-item"><span>${label}</span><strong>${time}</strong></div>`:"";}).join("")||"<div class='prayer-item' style='grid-column:1/-1'>Data salat untuk tanggal ini tidak tersedia.</div>";}catch(e){timesEl.innerHTML="<div class='prayer-item' style='grid-column:1/-1'>Jadwal salat belum tersedia untuk wilayah atau tanggal ini. Pilih kota lain atau periksa koneksi internet.</div>";}}
-  function showPage(page){document.querySelectorAll("[data-content-page]").forEach(section=>{section.hidden=section.dataset.contentPage!==page;});document.querySelectorAll(".nav-item[data-page]").forEach(item=>{const active=item.dataset.page===page;item.classList.toggle("active",active);item.setAttribute("aria-current",active?"page":"false");});document.body.classList.toggle("compact-view",page!=="beranda");window.scrollTo({top:0,behavior:"smooth"});}
+  
+  
+function showPage(page) {
+  document.querySelectorAll("[data-content-page]").forEach(section => {
+    section.hidden = section.dataset.contentPage !== page;
+  });
+
+  document.querySelectorAll(".nav-item[data-page]").forEach(item => {
+    const active = item.dataset.page === page;
+    item.classList.toggle("active", active);
+    item.setAttribute("aria-current", active ? "page" : "false");
+  });
+
+  document.body.classList.toggle("compact-view", page !== "beranda");
+  document.body.classList.toggle("donation-view", page === "donasi");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+  
   function selectKajianCity(city){selectedKajianCity=city;selectedKajianDay="";selectedKajianTime="";document.querySelectorAll(".city-button").forEach(b=>b.classList.toggle("selected",(city==="tangsel"&&b.textContent.includes("Tangerang Selatan"))||(city==="jakarta"&&b.textContent.includes("Jakarta"))));document.getElementById("kajian-day-area").hidden=false;document.getElementById("kajian-time-area").hidden=false;document.querySelectorAll(".day-button,.time-button").forEach(b=>b.classList.remove("selected"));renderKajianCards();}
   function selectKajianDay(day){selectedKajianDay=day;selectedKajianTime="";document.querySelectorAll(".day-button").forEach(b=>b.classList.toggle("selected",b.dataset.day===day));document.querySelectorAll(".time-button").forEach(b=>b.classList.remove("selected"));renderKajianCards();}
   function selectKajianTime(time){selectedKajianTime=time;document.querySelectorAll(".time-button").forEach(b=>b.classList.toggle("selected",b.dataset.time===time));renderKajianCards();}
