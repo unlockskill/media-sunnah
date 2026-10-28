@@ -198,7 +198,150 @@
   function selectKajianDay(day){selectedKajianDay=day;selectedKajianTime="";document.querySelectorAll(".day-button").forEach(b=>b.classList.toggle("selected",b.dataset.day===day));document.querySelectorAll(".time-button").forEach(b=>b.classList.remove("selected"));renderKajianCards();}
   function selectKajianTime(time){selectedKajianTime=time;document.querySelectorAll(".time-button").forEach(b=>b.classList.toggle("selected",b.dataset.time===time));renderKajianCards();}
   function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-  function renderKajianCards(){const wadah=document.getElementById("kajian-mosque-list"),totalEl=document.getElementById("kajian-total");if(!selectedKajianCity){wadah.innerHTML="";totalEl.hidden=true;return;}const hasil=daftarMasjidKajian.filter(m=>m.kota===selectedKajianCity&&(!selectedKajianDay||m.hari===selectedKajianDay)&&(!selectedKajianTime||m.waktu===selectedKajianTime));totalEl.hidden=false;totalEl.textContent=`Total kajian: ${hasil.length} kajian`;if(!hasil.length){wadah.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><strong>Data belum tersedia</strong><p>${selectedKajianCity==="jakarta"?"Data kajian Jakarta belum dimasukkan. Saat ini data awal yang tersedia adalah Tangerang Selatan.":"Belum ada jadwal kajian untuk pilihan ini."}</p></div>`;return;}wadah.innerHTML=hasil.map(m=>{const materiAsli=m.materi.replace(/\s*setiap bulan/gi,"");const cocok=materiAsli.match(/(?:khusus\s+)?pekan\s+ke-\d+(?:\s*(?:dan|&)\s*ke-\d+)*/i);const materiBersih=materiAsli.replace(cocok?cocok[0]:"","").replace(/\s*[—-]\s*$/,"").trim();return `<article class="mosque-card">${m.foto?`<img class="mosque-photo" src="${escapeHTML(m.foto)}" alt="${escapeHTML(m.nama)}" loading="lazy" onerror="this.style.display='none'">`:""}<div class="mosque-card-body"><h3 class="mosque-name">${escapeHTML(m.nama)}</h3><p class="mosque-address">${escapeHTML(m.alamat)}</p><p class="mosque-ustadz"><strong>${escapeHTML(m.ustadz)}</strong></p><p class="mosque-material">Materi: ${escapeHTML(materiBersih)}</p>${cocok?`<p class="mosque-week">${escapeHTML(cocok[0].toUpperCase())}</p>`:""}<p class="mosque-schedule">${escapeHTML(m.hari)} · ${escapeHTML(m.jam||m.waktu+"–selesai")}</p><div class="mosque-socials"><a href="${escapeHTML(m.maps)}" target="_blank" rel="noopener noreferrer" aria-label="Buka lokasi di Google Maps" title="Google Maps">📍</a>${m.instagram?`<a href="${escapeHTML(m.instagram)}" target="_blank" rel="noopener noreferrer" aria-label="Buka Instagram masjid" title="Instagram">◎</a>`:""}</div></div></article>`;}).join("");}
+  
+function renderKajianCards() {
+  const wadah = document.getElementById("kajian-mosque-list");
+  const totalEl = document.getElementById("kajian-total");
+
+  if (!selectedKajianCity) {
+    wadah.innerHTML = "";
+    totalEl.hidden = true;
+    return;
+  }
+
+  const hasil = daftarMasjidKajian.filter(m =>
+    m.kota === selectedKajianCity &&
+    (!selectedKajianDay || m.hari === selectedKajianDay) &&
+    (!selectedKajianTime || m.waktu === selectedKajianTime)
+  );
+
+  totalEl.hidden = false;
+  totalEl.textContent = `Total kajian: ${hasil.length} kajian`;
+
+  if (!hasil.length) {
+    wadah.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <strong>Data belum tersedia</strong>
+        <p>${
+          selectedKajianCity === "jakarta"
+            ? "Data kajian Jakarta belum dimasukkan. Saat ini data awal yang tersedia adalah Tangerang Selatan."
+            : "Belum ada jadwal kajian untuk pilihan ini."
+        }</p>
+      </div>`;
+    return;
+  }
+
+  wadah.innerHTML = hasil.map(m => {
+    const materiAsli = m.materi.replace(/\s*setiap bulan/gi, "");
+    const cocok = materiAsli.match(
+      /(?:khusus\s+)?pekan\s+ke-\d+(?:\s*(?:dan|&)\s*ke-\d+)*/i
+    );
+
+    const materiBersih = materiAsli
+      .replace(cocok ? cocok[0] : "", "")
+      .replace(/\s*[—-]\s*$/, "")
+      .trim();
+
+    return `
+      <article class="mosque-card">
+        ${
+          m.foto
+            ? `<img
+                class="mosque-photo"
+                src="${escapeHTML(m.foto)}"
+                alt="${escapeHTML(m.nama)}"
+                loading="lazy"
+                onerror="this.style.display='none'"
+              >`
+            : ""
+        }
+
+        <div class="mosque-card-body">
+          <h3 class="mosque-name">${escapeHTML(m.nama)}</h3>
+
+          <p class="mosque-address">
+            ${escapeHTML(m.alamat)}
+          </p>
+
+          <p class="mosque-ustadz">
+            <strong>${escapeHTML(m.ustadz)}</strong>
+          </p>
+
+          <p class="mosque-material">
+            Materi: ${escapeHTML(materiBersih)}
+          </p>
+
+          ${
+            cocok
+              ? `<p class="mosque-week">
+                  ${escapeHTML(cocok[0].toUpperCase())}
+                </p>`
+              : ""
+          }
+
+          <p class="mosque-schedule">
+            ${escapeHTML(m.hari)} ·
+            ${escapeHTML(m.jam || m.waktu + "–selesai")}
+          </p>
+
+          <div class="mosque-socials">
+            <a
+              href="${escapeHTML(m.maps)}"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Buka lokasi di Google Maps"
+              title="Google Maps"
+            >📍</a>
+
+            ${
+              m.instagram
+                ? `<a
+                    href="${escapeHTML(m.instagram)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Buka Instagram masjid"
+                    title="Instagram"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="21"
+                      height="21"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="5"
+                      ></rect>
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="4"
+                      ></circle>
+                      <circle
+                        cx="17.5"
+                        cy="6.5"
+                        r="1"
+                        fill="currentColor"
+                        stroke="none"
+                      ></circle>
+                    </svg>
+                  </a>`
+                : ""
+            }
+          </div>
+        </div>
+      </article>`;
+  }).join("");
+}
+
   function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n);}
   function chooseAmount(amount,button){donationAmount=amount;document.querySelectorAll(".amount-btn").forEach(b=>b.classList.toggle("selected",b===button));document.getElementById("custom-amount").value="";document.getElementById("donation-total").textContent=rupiah(donationAmount);}
   function setCustomAmount(){const value=Number(document.getElementById("custom-amount").value);if(value>=10000){donationAmount=Math.floor(value);document.querySelectorAll(".amount-btn").forEach(b=>b.classList.remove("selected"));document.getElementById("donation-total").textContent=rupiah(donationAmount);}else if(!document.getElementById("custom-amount").value){document.getElementById("donation-total").textContent=rupiah(donationAmount);}}
