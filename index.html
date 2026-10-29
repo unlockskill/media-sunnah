@@ -22,7 +22,16 @@
     .donate-nav:hover{background:var(--gold-light)!important;color:#172033!important}
     .container{width:100%;max-width:1120px;margin:0 auto;padding:22px 16px 36px}
     .basmalah{text-align:center;padding:20px 12px 22px;margin-bottom:20px;border-bottom:1px solid var(--border)}.arabic{font-family:"Noto Naskh Arabic","Amiri","Traditional Arabic",serif;font-size:clamp(27px,6vw,38px);line-height:1.8;color:var(--gold-light);direction:rtl}.basmalah-note{margin-top:7px;color:var(--muted);font-size:11px;letter-spacing:1.5px}
-    .clock-card{background:linear-gradient(135deg,#17243a,#101629);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:18px}.location{color:var(--gold);font-size:13px;margin-bottom:12px}#clock{font-size:clamp(36px,8vw,54px);font-weight:bold;letter-spacing:1px;font-variant-numeric:tabular-nums}#date{color:var(--muted);font-size:14px;margin-top:8px}.location-control{max-width:320px;width:100%}.location-control label{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}.location-control select{width:100%;padding:10px;border:1px solid #34415a;border-radius:9px;background:#080d1a;color:var(--text)}.location-status{font-size:11px;color:var(--muted);line-height:1.5;margin-top:7px}
+    .clock-card{background:linear-gradient(135deg,#17243a,#101629);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:18px}.location{color:var(--gold);font-size:13px;margin-bottom:12px}#clock{font-size:clamp(36px,8vw,54px);font-weight:bold;letter-spacing:1px;font-variant-numeric:tabular-nums}#date{color:var(--muted);font-size:14px;margin-top:8px}.location-control{max-width:320px;width:100%}.location-control label{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}.location-control select{width:100%;padding:10px;border:1px solid #34415a;border-radius:9px;background:#080d1a;color:var(--text)}
+    .region-search-wrap{position:relative;width:100%}
+    #region-search{width:100%;padding:10px;border:1px solid #34415a;border-radius:9px;background:#080d1a;color:var(--text)}
+    #region-suggestions{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:1200;max-height:240px;overflow-y:auto;background:#111a2c;border:1px solid #34415a;border-radius:10px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+    #region-suggestions[hidden]{display:none}
+    .region-suggestion{display:block;width:100%;padding:11px 12px;text-align:left;border:0;border-bottom:1px solid #293750;background:transparent;color:#f1f5f9;font-size:14px}
+    .region-suggestion:last-child{border-bottom:0}
+    .region-suggestion:hover,.region-suggestion:focus{background:#17243a;color:#f1dca3;outline:none}
+    .region-no-results{padding:12px;color:#9caac0;font-size:13px}
+.location-status{font-size:11px;color:var(--muted);line-height:1.5;margin-top:7px}
     .section-title{font-size:21px;margin:26px 0 14px;color:var(--gold-light)}.prayer-shell{margin:0 0 24px;padding:16px;background:var(--panel);border:1px solid #34415a;border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.prayer-shell .section-title{margin:0 0 8px;font-size:18px}.prayer-heading{font-size:12px;color:var(--muted);margin-bottom:12px}.prayer-times{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}.prayer-item{min-width:0;text-align:center;padding:12px 4px;background:#f1f5f9;border:1px solid #dbe3ee;border-radius:10px;color:#172033}.prayer-item span{display:block;font-size:11px;color:#475569;font-weight:700;margin-bottom:7px}.prayer-item strong{display:block;font-size:16px}.prayer-note{color:var(--muted);font-size:11px;line-height:1.6;margin:11px 0 0}.prayer-note a{color:var(--gold-light)}
     .activity-intro,.kajian-intro{color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:16px}.hero-panel{background:linear-gradient(145deg,#17243a,#101629);border:1px solid #34415a;border-radius:18px;padding:22px}.hero-panel h2{margin:0 0 8px;color:var(--gold-light);font-size:clamp(23px,4vw,32px)}.hero-panel p{color:#cbd5e1;line-height:1.7;margin:0 0 16px}.hero-actions{display:flex;flex-wrap:wrap;gap:10px}.primary-btn,.secondary-btn{border:0;border-radius:10px;padding:12px 15px;font-weight:700}.primary-btn{background:var(--gold);color:#172033}.secondary-btn{background:#17233b;border:1px solid #34415a;color:var(--gold-light)}
     .empty-state{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;text-align:center}.empty-icon{font-size:28px;margin-bottom:10px}.empty-state p{color:var(--muted);font-size:14px;line-height:1.7}.coming-soon{display:inline-block;border:1px solid #6d5a34;color:var(--gold-light);border-radius:20px;padding:7px 12px;font-size:12px;margin-top:8px}
@@ -121,13 +130,19 @@ body.donation-view .prayer-shell {
     <div class="location-control">
       
 <label for="region-search">Cari kota atau kabupaten</label>
-<input
-  id="region-search"
-  type="search"
-  placeholder="Contoh: Makassar, Bogor..."
-  autocomplete="off"
->
-<select id="region-select">
+<div class="region-search-wrap">
+  <input
+    id="region-search"
+    type="search"
+    placeholder="Contoh: Makassar, Bogor..."
+    autocomplete="off"
+    aria-label="Cari kota atau kabupaten"
+    aria-controls="region-suggestions"
+    aria-autocomplete="list"
+  >
+  <div id="region-suggestions" role="listbox" hidden></div>
+</div>
+<select id="region-select" aria-label="Pilih kota atau kabupaten">
   <option value="">Mendeteksi lokasi atau memuat daftar kota...</option>
 </select>
 
@@ -269,69 +284,115 @@ body.donation-view .prayer-shell {
 function populateRegionSelect() {
   const select = document.getElementById("region-select");
   const search = document.getElementById("region-search");
+  const suggestions = document.getElementById("region-suggestions");
 
   const sorted = [...prayerRegions].sort((a, b) =>
-    String(a.name).localeCompare(String(b.name), "id")
+    String(a.name || "").localeCompare(String(b.name || ""), "id")
   );
 
-  function renderOptions(query = "") {
+  function matchingRegions(query) {
     const q = query.trim().toLocaleLowerCase("id-ID");
-
-    const filtered = sorted.filter(r =>
+    if (!q) return [];
+    return sorted.filter(r =>
       `${r.name || ""} ${r.province || ""} ${r.id || ""}`
         .toLocaleLowerCase("id-ID")
         .includes(q)
     );
+  }
 
+  function renderSelectOptions(results = sorted) {
     const currentId = activeRegion?.id;
     select.innerHTML = "";
-
-    // Opsi placeholder mencegah satu-satunya hasil langsung terpilih otomatis.
     const placeholder = document.createElement("option");
     placeholder.value = "";
-    placeholder.textContent = filtered.length
-      ? "Pilih kota atau kabupaten..."
-      : "Wilayah tidak ditemukan";
+    placeholder.textContent = "Pilih kota atau kabupaten...";
     select.appendChild(placeholder);
 
-    filtered.forEach(r => {
+    results.forEach(r => {
       const option = document.createElement("option");
       option.value = r.id;
-      option.textContent =
-        `${r.name}${r.province ? " — " + r.province : ""} (${zoneAbbr(r)})`;
+      option.textContent = `${r.name}${r.province ? " — " + r.province : ""} (${zoneAbbr(r)})`;
       select.appendChild(option);
     });
 
-    // Pertahankan pilihan aktif bila masih termasuk hasil pencarian.
-    if (currentId && filtered.some(r => r.id === currentId)) {
+    if (currentId && results.some(r => r.id === currentId)) {
       select.value = currentId;
     } else {
       select.value = "";
     }
   }
 
-  search.addEventListener("input", () => {
-    renderOptions(search.value);
+  function chooseRegion(region) {
+    if (!region) return;
+    activeRegion = region;
+    search.value = `${region.name}${region.province ? ", " + region.province : ""}`;
+    suggestions.hidden = true;
+    renderSelectOptions(sorted);
+    select.value = region.id;
+    document.getElementById("location-status").textContent =
+      "Lokasi dipilih manual. Jam dan jadwal salat mengikuti wilayah pilihan ini.";
+    updateClock();
+    loadPrayerTimes();
+  }
+
+  function renderSuggestions(query) {
+    const results = matchingRegions(query);
+    suggestions.innerHTML = "";
+
+    if (!query.trim()) {
+      suggestions.hidden = true;
+      renderSelectOptions(sorted);
+      return;
+    }
+
+    if (!results.length) {
+      const empty = document.createElement("div");
+      empty.className = "region-no-results";
+      empty.textContent = "Kota atau kabupaten tidak ditemukan.";
+      suggestions.appendChild(empty);
+      suggestions.hidden = false;
+      renderSelectOptions([]);
+      return;
+    }
+
+    results.slice(0, 80).forEach(region => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "region-suggestion";
+      button.setAttribute("role", "option");
+      button.textContent = `${region.name}${region.province ? " — " + region.province : ""} (${zoneAbbr(region)})`;
+      button.addEventListener("click", () => chooseRegion(region));
+      suggestions.appendChild(button);
+    });
+
+    suggestions.hidden = false;
+    renderSelectOptions(results);
+  }
+
+  search.addEventListener("input", () => renderSuggestions(search.value));
+  search.addEventListener("focus", () => {
+    if (search.value.trim()) renderSuggestions(search.value);
+  });
+  search.addEventListener("keydown", event => {
+    if (event.key === "Escape") suggestions.hidden = true;
+    if (event.key === "Enter") {
+      const first = suggestions.querySelector(".region-suggestion");
+      if (first && !suggestions.hidden) {
+        event.preventDefault();
+        first.click();
+      }
+    }
+  });
+  document.addEventListener("click", event => {
+    if (!event.target.closest(".region-search-wrap")) suggestions.hidden = true;
   });
 
   select.addEventListener("change", () => {
     const chosen = prayerRegions.find(r => r.id === select.value);
-
-    if (chosen) {
-      activeRegion = chosen;
-      // Jangan kosongkan kolom pencarian; biarkan pengguna mengubah kata kunci sendiri.
-      renderOptions(search.value);
-      select.value = chosen.id;
-
-      document.getElementById("location-status").textContent =
-        "Lokasi dipilih manual. Jam dan jadwal salat mengikuti wilayah pilihan ini.";
-
-      updateClock();
-      loadPrayerTimes();
-    }
+    if (chosen) chooseRegion(chosen);
   });
 
-  renderOptions("");
+  renderSelectOptions(sorted);
 }
 
   async function initLocationAndPrayer(){const status=document.getElementById("location-status");try{const response=await fetch(REGIONS_URL);if(!response.ok)throw new Error("Daftar wilayah tidak tersedia");const payload=await response.json();prayerRegions=normaliseRegions(payload);if(!prayerRegions.length)throw new Error("Format daftar wilayah tidak dikenali");populateRegionSelect();activeRegion=fallbackRegionByTimeZone();if(activeRegion)document.getElementById("region-select").value=activeRegion.id;updateClock();await loadPrayerTimes();}catch(e){status.textContent="Daftar kota belum dapat dimuat. Jam mengikuti zona waktu perangkat, sedangkan jadwal salat memerlukan pilihan wilayah yang didukung.";activeRegion=null;updateClock();document.getElementById("prayer-date").textContent="Jadwal salat belum dapat dimuat.";document.getElementById("prayer-times").innerHTML="<div class='prayer-item' style='grid-column:1/-1'>Periksa koneksi internet, kemudian muat ulang halaman.</div>";return;}
