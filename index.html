@@ -286,13 +286,13 @@ function populateRegionSelect() {
     const currentId = activeRegion?.id;
     select.innerHTML = "";
 
-    if (!filtered.length) {
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "Wilayah tidak ditemukan";
-      select.appendChild(option);
-      return;
-    }
+    // Opsi placeholder mencegah satu-satunya hasil langsung terpilih otomatis.
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = filtered.length
+      ? "Pilih kota atau kabupaten..."
+      : "Wilayah tidak ditemukan";
+    select.appendChild(placeholder);
 
     filtered.forEach(r => {
       const option = document.createElement("option");
@@ -302,8 +302,11 @@ function populateRegionSelect() {
       select.appendChild(option);
     });
 
+    // Pertahankan pilihan aktif bila masih termasuk hasil pencarian.
     if (currentId && filtered.some(r => r.id === currentId)) {
       select.value = currentId;
+    } else {
+      select.value = "";
     }
   }
 
@@ -316,8 +319,8 @@ function populateRegionSelect() {
 
     if (chosen) {
       activeRegion = chosen;
-      search.value = "";
-      renderOptions("");
+      // Jangan kosongkan kolom pencarian; biarkan pengguna mengubah kata kunci sendiri.
+      renderOptions(search.value);
       select.value = chosen.id;
 
       document.getElementById("location-status").textContent =
