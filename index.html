@@ -166,7 +166,7 @@ body.donation-view .prayer-shell {
     </div>
     <h2 class="section-title">Kajian yang Terdata</h2>
     <p class="activity-intro">Pilih kota pada menu Kajian untuk melihat kartu masjid, jadwal, materi, peta, dan akun media sosial yang tersedia.</p>
-    <div class="empty-state"><div class="empty-icon">✦</div><strong>Belajar ilmu agama bersama</strong><p>Data awal memuat Masjid As-Sunnah VCM dan Masjid Al Barkah Sawah Baru. Informasi lainnya akan ditambahkan bertahap.</p><button class="primary-btn" onclick="showPage('kajian')">Lihat data kajian</button></div>
+    <div class="empty-state"><div class="empty-icon">✦</div><strong>Belajar ilmu agama bersama</strong><p>Data masjid dan jadwal kajian dimuat langsung dari database Media Sunnah dan akan terus diperbarui.</p><button class="primary-btn" onclick="showPage('kajian')">Lihat data kajian</button></div>
   </section>
 
   <section data-content-page="kajian" hidden>
@@ -320,48 +320,12 @@ body.donation-view .prayer-shell {
   let selectedKajianTime = "";
   let donationAmount = 100000;
 
-  const daftarMasjidKajian = [
-    {id:1,kota:"tangsel",nama:"Masjid As-Sunnah VCM",alamat:"Kompleks Cinere Mas, Pisangan, Ciputat Timur, Tangerang Selatan",foto:"images/masjid-as-sunnah-vcm.webp",ustadz:"Ustadz Armin Akbar",materi:"Jejak Perjuangan dan Keteladanan Para Sahabat",hari:"Ahad",waktu:"Ba’da Magrib",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+As-Sunnah+VCM+Ciputat+Timur",instagram:"https://www.instagram.com/masjidassunnahvcm?dlrf=MTFveTQ4aW82a3p1NQ==",sumber:"https://majlis.id/locations/01ef3b80-e663-4f62-8514-d9af73488c8d"},
-    {id:2,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Abu Yahya Badrusalam, Lc.",materi:"Tafsir Al-Qur'an (surah belum dikonfirmasi) — khusus pekan ke-4 setiap bulan",hari:"Rabu",waktu:"Dhuha",jam:"09.00–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:3,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Dr. Erwandi Tarmizi, M.A.",materi:"Fiqh Praktis Madzhab Syafi'i (bab belum dikonfirmasi) — khusus pekan ke-1 setiap bulan",hari:"Rabu",waktu:"Dhuha",jam:"09.30–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:4,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Aep Saepullah ibnu Ahmad, Lc.",materi:"Shahih Adabul Mufrad (bab belum dikonfirmasi) — khusus pekan ke-3 setiap bulan",hari:"Rabu",waktu:"Dhuha",jam:"09.30–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:5,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Afdhallul Ziqri, Lc.",materi:"Asy-Syamaail Al-Muhammadiyyah (bab belum dikonfirmasi) — pekan ke-1 dan ke-3 setiap bulan",hari:"Rabu",waktu:"Ba’da Magrib",jam:"Ba’da Magrib–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:6,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Farhan Abu Furaihan",materi:"Syarhus Sunnah (bab belum dikonfirmasi) — khusus pekan ke-2 setiap bulan",hari:"Rabu",waktu:"Ba’da Magrib",jam:"Ba’da Magrib–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:7,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Ahmad Ali Rozaq, Lc.",materi:"Kajian Kitab Fikih Asmaul Husna",hari:"Jumat",waktu:"Ba’da Magrib",jam:"Ba’da Magrib–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:8,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Dr. Abu Islama Imanuddin, M.A.",materi:"Belajar Mudah Akidah Salaf — khusus pekan ke-2 dan ke-4 setiap bulan",hari:"Sabtu",waktu:"Subuh",jam:"Ba’da Subuh–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:9,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Dr. Emha Hasan Ayatullah, M.A.",materi:"Kitab Al-Khabair",hari:"Sabtu",waktu:"Dhuha",jam:"08.00–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:10,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Ahmad Zainuddin Al Banjary, Lc., M.A.",materi:"Tafsir Al-Fatihah — khusus pekan ke-2 setiap bulan",hari:"Sabtu",waktu:"Ba’da Dzuhur",jam:"12.30–14.00",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:11,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Abu Zaid Cecep Nurrohman, Lc., M.A.",materi:"Kitab Fikih Muyassar — khusus pekan ke-2 dan ke-4 setiap bulan",hari:"Sabtu",waktu:"Ba’da Magrib",jam:"Ba’da Magrib–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:12,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Abu Haitsam Yadi Supriyadi, Lc., M.Si.",materi:"Perkara-Perkara Perusak Tauhid — khusus pekan ke-3 setiap bulan",hari:"Sabtu",waktu:"Ba’da Magrib",jam:"Ba’da Magrib–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {id:13,kota:"tangsel",nama:"Masjid Al Barkah Sawah Baru",alamat:"Sawah Baru, Ciputat, Tangerang Selatan",foto:"images/masjid-al-barkah-sawah-baru.jpg",ustadz:"Ustadz Aep Saepullah ibnu Ahmad, Lc.",materi:"Kitab Al-Lu'lu' wal Marjan",hari:"Ahad",waktu:"Ba’da Magrib",jam:"Ba’da Magrib–selesai",maps:"https://www.google.com/maps/search/?api=1&query=Masjid+Al+Barkah+Sawah+Baru+Ciputat",instagram:"https://www.instagram.com/masjidalbarkah_sawahbaru/",sumber:""},
-    {"id":14,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Abdullah Taslim, Lc., M.A.","materi":"Masail al-Jahiliyah. Karya Syaikh Muhammad bin Abdul Wahhab رحمه الله.","hari":"Selasa","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":15,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Atori Husen","materi":"Serial Kisah Sahabat Rasulullah","hari":"Sabtu","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":16,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Abu Yahya Tomi","materi":"Lammud Durril Mantsur min Aqwalil Ma'tsur fil I'tiqod was Sunnah. Kitab karya Syaikh Jamal bin Furaihan al Haritsi.","hari":"Kamis","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":17,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Mizan Qudsiyah, Lc., M.A.","materi":"Hadist Shahih Menyebarkan Ilmu","hari":"Jumat","waktu":"Ba’da Ashar","jam":"Ba’da Ashar–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":18,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Atori Husen","materi":"Sirah Sahabat-Sahabat Nabi","hari":"Sabtu","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":19,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Gigih Surya Nugraha, S.H.","materi":"Kitab Qowaid Qur'aniyah","hari":"Ahad","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":20,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Aep Saepullah, Lc.","materi":"Kitab Al Kabir (karya Syaikh Imam Syamsuddin adz-Dzahabi)","hari":"Sabtu","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":21,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Abdullah Taslim, Lc., M.A.","materi":"Kitab Masail Jahiliyah","hari":"Selasa","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":22,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Atori Husen","materi":"Umdatul Ahkam karya Syaikh Abdul Ghani al-Maqdisi","hari":"Sabtu","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":23,"kota":"tangsel","nama":"Masjid Al Amanah","alamat":"Perumahan Bukit Nusa Indah, Jl. Kakaktua No. 1, Kel. Serua, Kec. Ciputat, Kota Tangerang Selatan, Banten 15414","foto":"images/masjid-al-amanah-ciputat.webp","ustadz":"Ustadz Abu Yahya Tomy","materi":"Al Ajwibah Al Mufidah'an As Ilatil Manahijil Jadidah. Kitab karya Syaikh Dr. Shalih bin Fauzan al-Fauzan.","hari":"Kamis","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/e8ty9dkuzWRa4ZEU8","instagram":"https://www.instagram.com/masjidalamanah?obrf=eXF1amQ0Y2wzZzYy","sumber":""},
-    {"id":24,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Sulaiman Abu Syeikha, Lc., M.Pd.","materi":"Kitab Tauhid","hari":"Sabtu","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":25,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Abdulbarr Kaisibda","materi":"Kitab Tafsir Muyassar","hari":"Sabtu","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":26,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Dr. Emha Hasan Ayatullah, M.A.","materi":"Kitab Makanatus Sunnah an-Nabawiyah","hari":"Sabtu","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":27,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Irwansyah Al-Maidany","materi":"Ensiklopedi Adab Islam","hari":"Ahad","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":28,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Ahmad Ali Rozaq, Lc.","materi":"Kitab Kumpulan Adab Islam","hari":"Ahad","waktu":"Subuh","jam":"Ba’da Subuh–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":29,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Agus Hendra Gunawan","materi":"Sunnah seputar bersin","hari":"Senin","waktu":"Dhuha","jam":"08.00–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":30,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Najmi Umar Bakkar","materi":"Tidak menyuruh yang ma'ruf dan mencegah dari yang mungkar","hari":"Rabu","waktu":"Dhuha","jam":"09.30–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":31,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Rido Abu Hafidzh, S.Pd.I., M.Pd.","materi":"Seorang muslim senantiasa menginginkan kebaikan untuk orang lain","hari":"Rabu","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":32,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadzah Hani Nurul Husna, Lc.","materi":"Sunnah-Sunnah Sholat","hari":"Kamis","waktu":"Dhuha","jam":"09.30","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":"","khususAkhwat":true},
-    {"id":33,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Agus Hendra Gunawan","materi":"Kitab Amalan Sunnah Setahun","hari":"Kamis","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":34,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Abdullah Taslim, M.A.","materi":"Kitab Fadhlul Islam","hari":"Senin","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":35,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadzah Erika Suryani, Lc.","materi":"Kitab Riyadulhus Shalihin","hari":"Senin","waktu":"Dhuha","jam":"09.30–11.00","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":"","khususAkhwat":true},
-    {"id":36,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Fadil Mulyono, B.Sc.","materi":"Kitab Al-Wabilush Shayyib","hari":"Jumat","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":37,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Aep Saepullah","materi":"Arba'in an-Nawawi","hari":"Selasa","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":38,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Dr. Ahmad Ridwan, Lc., M.E.","materi":"Kitab Al-Adab Al-Mufrad","hari":"Senin","waktu":"Dhuha","jam":"09.30–11.00","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":39,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Gigih Surya Nugraha, S.H.","materi":"Kitab Tazkiyatun Nufus","hari":"Sabtu","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""},
-    {"id":40,"kota":"tangsel","nama":"Masjid Ash Shaff","alamat":"Distrik Emerald, Bintaro Jaya, Jl. Emerald Boulevard, Parigi, Kec. Pondok Aren, Kota Tangerang Selatan, Banten 15227","foto":"images/masjid-ash-shaff-emerald.jpg","ustadz":"Ustadz Dr. Salim Saleh, Lc., M.A.","materi":"Kitab Syarah Kitabul Jami","hari":"Jumat","waktu":"Ba’da Magrib","jam":"Ba’da Magrib–selesai","maps":"https://maps.app.goo.gl/GNj72oKKRtVEkDrH7","instagram":"https://www.instagram.com/masjidashshaff?vrfl=NG8zbWxpbzlvdnVu","sumber":""}
-  ];
+  // Data kajian sekarang dimuat langsung dari Supabase.
+  let daftarMasjidKajian = [];
+  let kajianLoadError = "";
+  const SUPABASE_URL = "https://puvxqonnoggxrmpbbwlo.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_yyI0cxrTdLzh092iYbkz6A_Qs96vpfx";
+
 
   function getLocalTimeZone(){return Intl.DateTimeFormat().resolvedOptions().timeZone||"Asia/Jakarta";}
   function dateForZone(zone){const parts=new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());const get=t=>parts.find(p=>p.type===t)?.value;return `${get("year")}-${get("month")}-${get("day")}`;}
@@ -572,10 +536,106 @@ function showPage(page) {
   function selectKajianDay(day){selectedKajianDay=day;selectedKajianTime="";document.querySelectorAll(".day-button").forEach(b=>b.classList.toggle("selected",b.dataset.day===day));document.querySelectorAll(".time-button").forEach(b=>b.classList.remove("selected"));renderKajianCards();}
   function selectKajianTime(time){selectedKajianTime=time;document.querySelectorAll(".time-button").forEach(b=>b.classList.toggle("selected",b.dataset.time===time));renderKajianCards();}
   function escapeHTML(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+  function kotaKeyFromName(name) {
+    const n = String(name || "").toLocaleLowerCase("id-ID");
+    if (n.includes("tangerang selatan")) return "tangsel";
+    if (n === "kota tangerang") return "tangerang";
+    if (n.includes("kabupaten tangerang")) return "kab-tangerang";
+    if (n.includes("jakarta")) return "jakarta";
+    if (n.includes("depok")) return "depok";
+    if (n.includes("bekasi")) return "bekasi";
+    if (n.includes("bogor")) return "bogor";
+    if (n.includes("bandung")) return "bandung";
+    if (n.includes("semarang")) return "semarang";
+    if (n.includes("yogyakarta")) return "yogyakarta";
+    if (n.includes("surabaya")) return "surabaya";
+    if (n.includes("malang")) return "malang";
+    if (n.includes("surakarta") || n.includes("solo")) return "solo";
+    if (n.includes("cirebon")) return "cirebon";
+    if (n.includes("makassar")) return "makassar";
+    return n.replace(/^(kota|kabupaten)\s+/, "").replace(/\s+/g, "-");
+  }
+
+  function formatDbTime(value) {
+    if (!value) return "";
+    return String(value).slice(0, 5).replace(":", ".");
+  }
+
+  async function supabaseGet(path) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+      method: "GET",
+      headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Accept: "application/json" }
+    });
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Supabase ${response.status}: ${detail.slice(0, 240)}`);
+    }
+    return response.json();
+  }
+
+  async function loadKajianFromSupabase() {
+    const target = document.getElementById("kajian-mosque-list");
+    if (target) target.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><strong>Memuat jadwal kajian...</strong><p>Mengambil data terbaru dari Media Sunnah.</p></div>';
+    try {
+      const [jadwal, masjid] = await Promise.all([
+        supabaseGet("jadwal_kajian?select=id,masjid_id,nama_kajian,ustadz,materi,hari,waktu_mulai,waktu_selesai,khusus_akhwat,catatan,status,jenis_kajian,poster_url&status=eq.published&order=hari.asc"),
+        supabaseGet("masjid?select=id,nama,alamat,wilayah_id,foto_url,maps_url,instagram_url,status&status=eq.aktif")
+      ]);
+
+      const masjidIds = [...new Set(masjid.map(m => m.wilayah_id).filter(Boolean))];
+      let wilayah = [];
+      if (masjidIds.length) {
+        wilayah = await supabaseGet(`wilayah?select=id,nama,jenis,parent_id&id=in.(${masjidIds.join(",")})`);
+      }
+      const wilayahById = new Map(wilayah.map(w => [String(w.id), w]));
+      const masjidById = new Map(masjid.map(m => [String(m.id), m]));
+
+      daftarMasjidKajian = jadwal.map(j => {
+        const m = masjidById.get(String(j.masjid_id));
+        if (!m) return null;
+        const w = wilayahById.get(String(m.wilayah_id));
+        const catatan = String(j.catatan || "");
+        const periode = catatan.match(/Periode:\s*([^;]+)/i)?.[1]?.trim() || "";
+        const waktuAsli = catatan.match(/Keterangan waktu asli:\s*([^;]+)/i)?.[1]?.trim() || "";
+        const jam = waktuAsli || (j.waktu_mulai ? `${formatDbTime(j.waktu_mulai)}${j.waktu_selesai ? "–" + formatDbTime(j.waktu_selesai) : "–selesai"}` : "");
+        return {
+          id: j.id,
+          masjidId: m.id,
+          kota: kotaKeyFromName(w?.nama || ""),
+          nama: m.nama,
+          alamat: m.alamat || "",
+          foto: m.foto_url || "",
+          ustadz: j.ustadz || "",
+          materi: j.materi || j.nama_kajian || "",
+          hari: j.hari || "",
+          waktu: periode || (j.waktu_mulai ? "Dhuha" : ""),
+          jam,
+          maps: m.maps_url || "",
+          instagram: m.instagram_url || "",
+          khususAkhwat: Boolean(j.khusus_akhwat),
+          poster: j.poster_url || ""
+        };
+      }).filter(Boolean);
+      kajianLoadError = "";
+      renderKajianCards();
+    } catch (error) {
+      console.error("Gagal memuat data kajian dari Supabase:", error);
+      kajianLoadError = "Data kajian belum dapat dimuat dari server. Periksa koneksi dan konfigurasi API, lalu muat ulang halaman.";
+      if (target) target.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><strong>Data kajian belum dapat dimuat</strong><p>${escapeHTML(kajianLoadError)}</p></div>`;
+    }
+  }
+
   
 function renderKajianCards() {
   const wadah = document.getElementById("kajian-mosque-list");
   const totalEl = document.getElementById("kajian-total");
+
+  if (kajianLoadError && !daftarMasjidKajian.length) {
+    wadah.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><strong>Data kajian belum dapat dimuat</strong><p>${escapeHTML(kajianLoadError)}</p></div>`;
+    totalEl.hidden = true;
+    return;
+  }
 
   if (!selectedKajianCity && !kajianMosqueQuery) {
     wadah.innerHTML = "";
@@ -660,7 +720,7 @@ function renderKajianCards() {
 
           <p class="mosque-schedule">
             ${escapeHTML(m.hari)} ·
-            ${escapeHTML(m.jam || m.waktu + "–selesai")}
+            ${escapeHTML(m.jam || (m.waktu ? m.waktu + "–selesai" : "Waktu belum dicantumkan"))}
           </p>
 
           <div class="mosque-socials">
@@ -727,6 +787,7 @@ function renderKajianCards() {
   document.querySelectorAll('input[name="payment-method"]').forEach(input=>input.addEventListener("change",()=>{document.querySelectorAll(".payment-option").forEach(label=>label.classList.toggle("selected",label.querySelector("input").checked));}));
   function startDonation(){const msg=document.getElementById("payment-message");msg.hidden=false;const name=document.getElementById("donor-name").value.trim();const method=document.querySelector('input[name="payment-method"]:checked')?.value;if(!Number.isFinite(donationAmount)||donationAmount<10000){msg.textContent="Nominal donasi minimum Rp 10.000.";return;}if(!name){msg.textContent="Silakan isi nama lengkap donatur terlebih dahulu.";document.getElementById("donor-name").focus();return;}if(method==="va"){msg.textContent="Virtual Account belum aktif karena penyedia pembayaran dan nomor VA belum dikonfigurasi. Data tidak dikirim ke server.";return;}if(QRIS_IMAGE_URL){msg.innerHTML="<strong>Periksa penerima sebelum membayar.</strong><br>Nominal pilihan: "+escapeHTML(rupiah(donationAmount))+"<img src=\""+escapeHTML(QRIS_IMAGE_URL)+"\" alt=\"QRIS resmi penerima donasi\"><p>Setelah memindai, pastikan nama penerima sesuai. Konfirmasi pembayaran otomatis belum aktif.</p>";}else{msg.textContent="QRIS belum diaktifkan. Pengelola harus memasukkan gambar atau URL QRIS resmi penerima terlebih dahulu. Tidak ada pembayaran yang diproses dan data formulir tidak dikirim ke server.";}}
   renderPopularRegions();
+  loadKajianFromSupabase();
   updateClock();setInterval(updateClock,1000);initLocationAndPrayer();
 </script>
 </body>
