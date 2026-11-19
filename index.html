@@ -621,8 +621,10 @@ function showPage(page) {
       renderKajianCards();
     } catch (error) {
       console.error("Gagal memuat data kajian dari Supabase:", error);
-      kajianLoadError = "Data kajian belum dapat dimuat dari server. Periksa koneksi dan konfigurasi API, lalu muat ulang halaman.";
-      if (target) target.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><strong>Data kajian belum dapat dimuat</strong><p>${escapeHTML(kajianLoadError)}</p></div>`;
+      kajianLoadError = error && error.message
+        ? `Detail teknis: ${error.message}`
+        : "Terjadi kesalahan yang belum diketahui saat mengambil data dari Supabase.";
+      if (target) target.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><strong>Data kajian belum dapat dimuat</strong><p>${escapeHTML(kajianLoadError)}</p><p>Silakan kirimkan pesan detail ini kepada pengelola untuk diperiksa.</p></div>`;
     }
   }
 
