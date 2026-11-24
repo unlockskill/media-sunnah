@@ -18,6 +18,9 @@
   <div class="brand"><div class="mark">DS</div><div><strong>Dakwah Sunnah</strong><small>MEDIA SUNNAH · ADMINISTRATION</small></div></div>
   <div class="eyebrow">Area terbatas</div><h1>Login Super Admin</h1><p class="muted">Masuk menggunakan akun yang telah diberi role Super Admin.</p>
   <form id="loginForm"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required placeholder="admin@email.com"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required placeholder="Masukkan password"><button class="btn wide" id="loginBtn">Masuk ke Dashboard</button></form>
+  <div style="text-align:center;margin-top:14px"><button type="button" id="forgotBtn" style="border:0;background:transparent;color:var(--gold2);text-decoration:underline;padding:7px">Lupa password?</button></div>
+  <form id="recoveryForm" class="hidden"><p class="muted">Masukkan email akun Super Admin. Kami akan mengirim tautan untuk mengatur ulang password.</p><label for="recoveryEmail">Email akun</label><input id="recoveryEmail" type="email" autocomplete="email" required placeholder="admin@email.com"><button class="btn wide" id="sendRecoveryBtn">Kirim tautan reset</button><button type="button" class="btn secondary wide" id="backLoginBtn">Kembali ke login</button></form>
+  <form id="newPasswordForm" class="hidden"><p class="muted">Tautan pemulihan terverifikasi. Buat password baru untuk akun Media Sunnah.</p><label for="newPassword">Password baru</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Minimal 8 karakter"><label for="confirmPassword">Ulangi password baru</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Ulangi password baru"><button class="btn wide" id="savePasswordBtn">Simpan password baru</button></form>
   <div id="loginMessage" class="notice">Akses hanya diberikan kepada akun dengan role <b>super_admin</b>. Pendaftaran akun tidak tersedia dari halaman ini.</div>
   <p class="footer-note">Media Sunnah · Ilmu · Amal · Ukhuwah</p>
  </div>
@@ -79,9 +82,33 @@ const SUPABASE_KEY='sb_publishable_yyI0cxrTdLzh092iYbkz6A_Qs96vpfx';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=id=>document.getElementById(id);
 function message(text,type=''){const el=$('loginMessage');el.textContent=text;el.className='notice '+type}
+function showLoginForm(mode='login'){
+ $('loginForm').classList.toggle('hidden',mode!=='login');
+ $('recoveryForm').classList.toggle('hidden',mode!=='recovery');
+ $('newPasswordForm').classList.toggle('hidden',mode!=='newPassword');
+ $('forgotBtn').classList.toggle('hidden',mode!=='login');
+}
+$('forgotBtn').addEventListener('click',()=>{ $('recoveryEmail').value=$('email').value.trim(); showLoginForm('recovery'); message('Masukkan email akun Super Admin untuk menerima tautan pemulihan.'); });
+$('backLoginBtn').addEventListener('click',()=>{showLoginForm('login');message('Silakan masuk menggunakan email dan password baru.');});
+$('recoveryForm').addEventListener('submit',async e=>{
+ e.preventDefault(); const btn=$('sendRecoveryBtn'); btn.disabled=true; btn.textContent='Mengirim tautan...';
+ const redirectTo=window.location.origin+window.location.pathname;
+ const {error}=await db.auth.resetPasswordForEmail($('recoveryEmail').value.trim(),{redirectTo});
+ btn.disabled=false; btn.textContent='Kirim tautan reset';
+ if(error){message('Gagal mengirim tautan: '+error.message,'error');return;}
+ message('Jika email tersebut terdaftar, tautan pemulihan akan dikirim. Periksa Kotak Masuk dan folder Spam.','success');
+});
+$('newPasswordForm').addEventListener('submit',async e=>{
+ e.preventDefault(); const pass=$('newPassword').value; if(pass!==$('confirmPassword').value){message('Konfirmasi password tidak sama.','error');return;}
+ const btn=$('savePasswordBtn');btn.disabled=true;btn.textContent='Menyimpan...';
+ const {error}=await db.auth.updateUser({password:pass});btn.disabled=false;btn.textContent='Simpan password baru';
+ if(error){message('Gagal memperbarui password: '+error.message,'error');return;}
+ await db.auth.signOut();showLoginForm('login');$('password').value='';$('newPassword').value='';$('confirmPassword').value='';message('Password berhasil diperbarui. Silakan login menggunakan password baru.','success');
+});
+db.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'){showLoginForm('newPassword');message('Tautan pemulihan diterima. Silakan buat password baru.','success');}});
 function showApp(profile){$('loginScreen').classList.add('hidden');$('appScreen').classList.remove('hidden');$('adminName').textContent=profile.nama_lengkap||'Super Admin';loadOverview()}
 function showLogin(){ $('appScreen').classList.add('hidden');$('loginScreen').classList.remove('hidden') }
-async function verifySession(){const {data:{session}}=await db.auth.getSession();if(!session)return;const {data:profile,error}=await db.from('profil_pengguna').select('user_id,nama_lengkap,role,status').eq('user_id',session.user.id).maybeSingle();if(error){message('Gagal memeriksa profil: '+error.message,'error');return}if(!profile||profile.role!=='super_admin'||profile.status!=='aktif'){await db.auth.signOut();message('Akun ini tidak memiliki akses Super Admin aktif.','error');return}showApp(profile)}
+async function verifySession(){if(window.location.hash.includes('type=recovery'))return;const {data:{session}}=await db.auth.getSession();if(!session)return;const {data:profile,error}=await db.from('profil_pengguna').select('user_id,nama_lengkap,role,status').eq('user_id',session.user.id).maybeSingle();if(error){message('Gagal memeriksa profil: '+error.message,'error');return}if(!profile||profile.role!=='super_admin'||profile.status!=='aktif'){await db.auth.signOut();message('Akun ini tidak memiliki akses Super Admin aktif.','error');return}showApp(profile)}
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('loginBtn');btn.disabled=true;btn.textContent='Memeriksa akun...';message('Sedang menghubungkan ke Supabase...');const {data,error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});btn.disabled=false;btn.textContent='Masuk ke Dashboard';if(error){message('Login gagal: '+error.message,'error');return}const {data:profile,error:profileError}=await db.from('profil_pengguna').select('user_id,nama_lengkap,role,status').eq('user_id',data.user.id).maybeSingle();if(profileError||!profile||profile.role!=='super_admin'||profile.status!=='aktif'){await db.auth.signOut();message(profileError?'Gagal membaca profil: '+profileError.message:'Akun belum memiliki role Super Admin aktif.','error');return}message('Login berhasil.','success');showApp(profile)});
 $('logoutBtn').addEventListener('click',async()=>{await db.auth.signOut();showLogin();message('Anda telah keluar.')});
 async function count(table,filter){let q=db.from(table).select('*',{count:'exact',head:true});if(filter)q=q.eq(filter[0],filter[1]);const {count,error}=await q;return error?null:count}
