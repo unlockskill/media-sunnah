@@ -110,6 +110,8 @@ body.donation-view .prayer-shell {
     .auth-submit{width:100%;border:0;border-radius:10px;padding:13px;background:var(--gold);color:#172033;font-weight:800;margin-top:8px}
     .auth-close{float:right;border:0;background:transparent;color:#cbd5e1;font-size:24px;line-height:1}
     .auth-message{padding:10px;border-radius:9px;background:#17243a;color:#f1dca3;font-size:12px;line-height:1.6;margin-top:12px}
+    .auth-link{display:block;margin:12px auto 0;padding:6px 10px;border:0;background:transparent;color:var(--gold-light);font-size:13px;text-decoration:underline;cursor:pointer}
+    .auth-link:hover{color:#fff}
     .auth-account-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
     .auth-account-actions button{border:1px solid #465675;border-radius:9px;background:#17233b;color:#f1dca3;padding:10px 13px;font-weight:700}
 
@@ -346,6 +348,7 @@ body.donation-view .prayer-shell {
       <input class="auth-field" id="auth-password" type="password" placeholder="Password (minimal 6 karakter)" autocomplete="current-password" minlength="6" required>
       <button class="auth-submit" id="auth-submit" type="submit">Login</button>
     </form>
+    <button class="auth-link" id="auth-forgot-link" type="button" onclick="setAuthMode('forgot')">Lupa Password?</button>
     <div class="auth-message" id="auth-message" hidden aria-live="polite"></div>
   </div>
 </div>
@@ -386,15 +389,45 @@ body.donation-view .prayer-shell {
   function openAuthModal(mode="login") {
     setAuthMode(mode);
     document.getElementById("auth-modal").classList.add("open");
-    document.getElementById("auth-email").focus();
+    const focusTarget = mode === "update" ? "auth-password" : "auth-email";
+    document.getElementById(focusTarget).focus();
   }
   function closeAuthModal() { document.getElementById("auth-modal").classList.remove("open"); }
   function setAuthMode(mode) {
-    authMode = mode === "register" ? "register" : "login";
-    document.getElementById("auth-login-tab").classList.toggle("active", authMode === "login");
-    document.getElementById("auth-register-tab").classList.toggle("active", authMode === "register");
-    document.getElementById("auth-submit").textContent = authMode === "login" ? "Login" : "Buat Akun";
-    document.getElementById("auth-password").autocomplete = authMode === "login" ? "current-password" : "new-password";
+    authMode = ["register", "forgot", "update"].includes(mode) ? mode : "login";
+    const loginTab = document.getElementById("auth-login-tab");
+    const registerTab = document.getElementById("auth-register-tab");
+    const tabs = document.querySelector(".auth-tabs");
+    const password = document.getElementById("auth-password");
+    const email = document.getElementById("auth-email");
+    const submit = document.getElementById("auth-submit");
+    const forgotLink = document.getElementById("auth-forgot-link");
+    const title = document.getElementById("auth-title");
+    const intro = document.querySelector("#auth-modal .auth-box > p");
+
+    tabs.hidden = authMode === "forgot" || authMode === "update";
+    loginTab.classList.toggle("active", authMode === "login");
+    registerTab.classList.toggle("active", authMode === "register");
+    email.hidden = authMode === "update";
+    email.required = authMode !== "update";
+    password.hidden = authMode === "forgot";
+    password.required = authMode !== "forgot";
+    password.value = "";
+    password.minLength = authMode === "update" || authMode === "register" ? 6 : 0;
+    password.placeholder = authMode === "update" ? "Password baru (minimal 6 karakter)" : "Password (minimal 6 karakter)";
+    password.autocomplete = authMode === "login" ? "current-password" : "new-password";
+
+    title.textContent = authMode === "forgot" ? "Reset Password" :
+      authMode === "update" ? "Buat Password Baru" : "Akun Media Sunnah";
+    intro.textContent = authMode === "forgot"
+      ? "Masukkan email akun. Kami akan mengirim tautan untuk membuat password baru."
+      : authMode === "update"
+        ? "Masukkan password baru untuk akun Media Sunnah kamu."
+        : "Login atau registrasi untuk mengakses Komunitas dan UMKM Shop.";
+    submit.textContent = authMode === "login" ? "Login" :
+      authMode === "register" ? "Buat Akun" :
+      authMode === "forgot" ? "Kirim Tautan Reset" : "Simpan Password Baru";
+    forgotLink.hidden = authMode !== "login";
     setAuthMessage("", false);
   }
   function requireMemberAccess(page) {
@@ -445,9 +478,21 @@ body.donation-view .prayer-shell {
     const password = document.getElementById("auth-password").value;
     const submit = document.getElementById("auth-submit");
     submit.disabled = true;
+    const originalLabel = submit.textContent;
     submit.textContent = "Memproses...";
     try {
-      if (authMode === "register") {
+      if (authMode === "forgot") {
+        const redirectTo = `${window.location.origin}${window.location.pathname}`;
+        const { error } = await memberSupabase.auth.resetPasswordForEmail(email, { redirectTo });
+        if (error) throw error;
+        setAuthMessage("Jika email terdaftar, tautan pemulihan akan dikirim. Periksa kotak masuk dan folder Spam/Junk.");
+      } else if (authMode === "update") {
+        if (password.length < 6) throw new Error("Password baru minimal 6 karakter.");
+        const { error } = await memberSupabase.auth.updateUser({ password });
+        if (error) throw error;
+        setAuthMessage("Password berhasil diperbarui. Silakan gunakan password baru untuk login berikutnya.");
+        setTimeout(() => { closeAuthModal(); showPage("akun"); }, 1800);
+      } else if (authMode === "register") {
         const { data, error } = await memberSupabase.auth.signUp({ email, password });
         if (error) throw error;
         if (data.session) {
@@ -470,7 +515,7 @@ body.donation-view .prayer-shell {
       setAuthMessage(error.message || "Terjadi kesalahan saat memproses akun.");
     } finally {
       submit.disabled = false;
-      submit.textContent = authMode === "login" ? "Login" : "Buat Akun";
+      submit.textContent = originalLabel;
     }
   }
   async function logoutMember() {
@@ -490,10 +535,14 @@ body.donation-view .prayer-shell {
       memberSession = data.session;
       memberAuthReady = true;
       updateMemberAccountUI();
-      memberSupabase.auth.onAuthStateChange((_event, session) => {
+      memberSupabase.auth.onAuthStateChange((event, session) => {
         memberSession = session;
         memberAuthReady = true;
         updateMemberAccountUI();
+        if (event === "PASSWORD_RECOVERY") {
+          openAuthModal("update");
+          setAuthMessage("Tautan pemulihan valid. Silakan buat password baru.");
+        }
       });
     } catch (error) {
       memberAuthReady = true;
