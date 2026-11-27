@@ -839,7 +839,7 @@ function showPage(page) {
     if (target) target.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><strong>Memuat jadwal kajian...</strong><p>Mengambil data terbaru dari Media Sunnah.</p></div>';
     try {
       const [jadwal, masjid] = await Promise.all([
-        supabaseGet("jadwal_kajian?select=id,masjid_id,nama_kajian,ustadz,materi,hari,pekan,waktu_mulai,waktu_selesai,khusus_akhwat,catatan,status,jenis_kajian,poster_url,created_by&status=eq.published&order=hari.asc"),
+        supabaseGet("jadwal_kajian?select=id,masjid_id,nama_kajian,ustadz,materi,hari,pekan,waktu_mulai,waktu_selesai,waktu_mulai_teks,waktu_selesai_teks,khusus_akhwat,catatan,status,jenis_kajian,poster_url,created_by&status=eq.published&order=hari.asc"),
         supabaseGet("masjid?select=id,nama,alamat,wilayah_id,foto_url,maps_url,instagram_url,status&status=eq.aktif")
       ]);
 
@@ -891,7 +891,9 @@ function showPage(page) {
         const catatan = String(j.catatan || "");
         const periode = catatan.match(/Periode:\s*([^;]+)/i)?.[1]?.trim() || "";
         const waktuAsli = catatan.match(/Keterangan waktu asli:\s*([^;]+)/i)?.[1]?.trim() || "";
-        const jam = waktuAsli || (j.waktu_mulai ? `${formatDbTime(j.waktu_mulai)}${j.waktu_selesai ? "–" + formatDbTime(j.waktu_selesai) : "–selesai"}` : "");
+        const mulaiTeks = j.waktu_mulai_teks || (j.waktu_mulai ? formatDbTime(j.waktu_mulai) : "");
+        const selesaiTeks = j.waktu_selesai_teks || (j.waktu_selesai ? formatDbTime(j.waktu_selesai) : "");
+        const jam = waktuAsli || (mulaiTeks ? `${mulaiTeks}${selesaiTeks ? "–" + selesaiTeks : ""}` : (selesaiTeks || ""));
         return {
           id: j.id,
           masjidId: m.id,
@@ -904,7 +906,7 @@ function showPage(page) {
           materi: j.materi || j.nama_kajian || "",
           pekan: j.pekan || "Semua Pekan",
           hari: j.hari || "",
-          waktu: periode || (j.waktu_mulai ? "Dhuha" : ""),
+          waktu: periode || (mulaiTeks ? "Waktu kajian" : ""),
           jam,
           maps: m.maps_url || "",
           instagram: m.instagram_url || "",
