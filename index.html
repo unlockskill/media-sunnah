@@ -839,7 +839,7 @@ function showPage(page) {
     if (target) target.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><strong>Memuat jadwal kajian...</strong><p>Mengambil data terbaru dari Media Sunnah.</p></div>';
     try {
       const [jadwal, masjid] = await Promise.all([
-        supabaseGet("jadwal_kajian?select=id,masjid_id,nama_kajian,ustadz,materi,hari,waktu_mulai,waktu_selesai,khusus_akhwat,catatan,status,jenis_kajian,poster_url,created_by&status=eq.published&order=hari.asc"),
+        supabaseGet("jadwal_kajian?select=id,masjid_id,nama_kajian,ustadz,materi,hari,pekan,waktu_mulai,waktu_selesai,khusus_akhwat,catatan,status,jenis_kajian,poster_url,created_by&status=eq.published&order=hari.asc"),
         supabaseGet("masjid?select=id,nama,alamat,wilayah_id,foto_url,maps_url,instagram_url,status&status=eq.aktif")
       ]);
 
@@ -902,6 +902,7 @@ function showPage(page) {
           foto: m.foto_url || "",
           ustadz: j.ustadz || "",
           materi: j.materi || j.nama_kajian || "",
+          pekan: j.pekan || "Semua Pekan",
           hari: j.hari || "",
           waktu: periode || (j.waktu_mulai ? "Dhuha" : ""),
           jam,
@@ -964,9 +965,7 @@ function renderKajianCards() {
 
   wadah.innerHTML = hasil.map(m => {
     const materiAsli = m.materi.replace(/\s*setiap bulan/gi, "");
-    const cocok = materiAsli.match(
-      /(?:khusus\s+)?pekan\s+ke-\d+(?:\s*(?:dan|&)\s*ke-\d+)*/i
-    );
+    const cocok = (m.pekan && m.pekan !== "Semua Pekan" ? m.pekan : "").match(/Pekan ke-[1-4](?:\s*(?:dan|&|,)\s*Pekan ke-[1-4])*/i) || materiAsli.match(/(?:khusus\s+)?pekan\s+ke-\d+(?:\s*(?:dan|&)\s*ke-\d+)*/i);
 
     const materiBersih = materiAsli
       .replace(cocok ? cocok[0] : "", "")
