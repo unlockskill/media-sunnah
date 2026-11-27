@@ -286,6 +286,8 @@ async function openMasjidModal(id=null){
  $('masjidForm').reset();$('masjidId').value='';$('masjidFotoUrl').value='';$('mFotoPreview').style.display='none';$('mFotoPreview').removeAttribute('src');$('masjidFormMessage').classList.add('hidden');
  const row=id?cachedMasjid.find(r=>r.id===id):null;
  $('masjidModalTitle').textContent=row?'Edit Data Masjid':'Tambah Masjid';
+ try{await setupRegionSelectors('m',row?.wilayah_id||null)}
+ catch(err){const box=$('masjidFormMessage');box.textContent='Gagal memuat pilihan wilayah: '+err.message;box.className='notice error'}
  if(row){$('masjidId').value=row.id;$('mNama').value=row.nama||'';$('mAlamat').value=row.alamat||'';$('mMaps').value=row.maps_url||'';$('mInstagram').value=row.instagram_url||'';$('mStatus').value=row.status||'aktif';$('masjidFotoUrl').value=row.foto_url||'';if(row.foto_url){$('mFotoPreview').src=row.foto_url;$('mFotoPreview').style.display='block'}}
  $('masjidModal').classList.add('show')
 }
@@ -296,6 +298,8 @@ $('cancelMasjid').addEventListener('click',closeMasjidModal);
 $('masjidForm').addEventListener('submit',async e=>{
  e.preventDefault();const btn=$('saveMasjidBtn');btn.disabled=true;btn.textContent='Menyimpan...';
  const maps=$('mMaps').value.trim(),instagram=$('mInstagram').value.trim();
+ const wilayahId=selectedDistrict('m');
+ if(!wilayahId){const box=$('masjidFormMessage');box.textContent='Pilih provinsi, kabupaten/kota, dan kecamatan masjid terlebih dahulu.';box.className='notice error';btn.disabled=false;btn.textContent='Simpan Masjid';return;}
  let fotoUrl=$('masjidFotoUrl').value||null;
  try{if($('mFoto').files?.[0])fotoUrl=await uploadImage($('mFoto').files[0],'foto-masjid')}catch(err){const box=$('masjidFormMessage');box.textContent='Gagal mengunggah foto masjid: '+err.message;box.className='notice error';btn.disabled=false;btn.textContent='Simpan Masjid';return}
  const payload={nama:$('mNama').value.trim(),alamat:$('mAlamat').value.trim()||null,wilayah_id:Number(wilayahId),maps_url:maps||null,instagram_url:instagram||null,foto_url:fotoUrl,status:$('mStatus').value,updated_at:new Date().toISOString()};
